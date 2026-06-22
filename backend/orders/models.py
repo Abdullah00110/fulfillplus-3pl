@@ -1,6 +1,28 @@
 from django.db import models
 
 
+class Customer(models.Model):
+    """A customer who places orders."""
+    name = models.CharField(max_length=150)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Warehouse(models.Model):
+    """A warehouse that fulfills orders."""
+    name = models.CharField(max_length=150)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Order(models.Model):
     """A single fulfillment order."""
 
@@ -10,9 +32,15 @@ class Order(models.Model):
         ("Shipped", "Shipped"),
     ]
 
-    customer_name = models.CharField(max_length=120)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name="orders", null=True
+    )
+    warehouse = models.ForeignKey(
+        Warehouse, on_delete=models.SET_NULL, related_name="orders", null=True, blank=True
+    )
     product = models.CharField(max_length=120)
     quantity = models.PositiveIntegerField(default=1)
+    reference_number = models.CharField(max_length=100, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -21,4 +49,4 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"#{self.pk} · {self.customer_name} · {self.product}"
+        return f"#{self.pk} · {self.product}"

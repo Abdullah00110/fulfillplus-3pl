@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 
-const EMPTY = { customer_name: "", product: "", quantity: 1, status: "Pending" };
+const EMPTY = { customer: "", warehouse: "", product: "", quantity: 1, reference_number: "", status: "Pending" };
 
-export default function OrderForm({ editing, onSave, onCancel }) {
+export default function OrderForm({ editing, customers, warehouses, onSave, onCancel }) {
   const [form, setForm] = useState(EMPTY);
 
-  // When an order is picked for editing, fill the form with its values
   useEffect(() => {
-    setForm(editing ? { ...editing } : EMPTY);
+    setForm(editing ? { ...EMPTY, ...editing } : EMPTY);
   }, [editing]);
 
   function change(e) {
@@ -16,8 +15,8 @@ export default function OrderForm({ editing, onSave, onCancel }) {
   }
 
   function submit() {
-    if (!form.customer_name.trim() || !form.product.trim()) {
-      alert("Customer name and product are required.");
+    if (!form.customer || !form.product.trim()) {
+      alert("Customer and product are required.");
       return;
     }
     onSave({ ...form, quantity: Math.max(1, form.quantity || 1) });
@@ -35,21 +34,36 @@ export default function OrderForm({ editing, onSave, onCancel }) {
         {editing ? `Edit order #${editing.id}` : "New order"}
       </p>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-500 dark:text-slate-400">Customer name</label>
-          <input className={input} name="customer_name" value={form.customer_name}
-                 onChange={change} placeholder="e.g. Abdullah Sunasra" />
+          <label className="text-xs text-slate-500 dark:text-slate-400">Customer *</label>
+          <select className={input} name="customer" value={form.customer} onChange={change}>
+            <option value="">Select customer…</option>
+            {customers.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 dark:text-slate-400">Warehouse</label>
+          <select className={input} name="warehouse" value={form.warehouse} onChange={change}>
+            <option value="">Select warehouse…</option>
+            {warehouses.map((w) => (
+              <option key={w.id} value={w.id}>{w.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 dark:text-slate-400">Reference number</label>
+          <input className={input} name="reference_number" value={form.reference_number} onChange={change} placeholder="Optional" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-slate-500 dark:text-slate-400">Product</label>
-          <input className={input} name="product" value={form.product}
-                 onChange={change} placeholder="e.g. Wireless mouse" />
+          <input className={input} name="product" value={form.product} onChange={change} placeholder="e.g. Wireless mouse" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-slate-500 dark:text-slate-400">Quantity</label>
-          <input className={input} type="number" min="1" name="quantity"
-                 value={form.quantity} onChange={change} />
+          <input className={input} type="number" min="1" name="quantity" value={form.quantity} onChange={change} />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-slate-500 dark:text-slate-400">Status</label>

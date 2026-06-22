@@ -3,10 +3,15 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import OrderForm from "./components/OrderForm";
 import OrderTable from "./components/OrderTable";
-import { getOrders, createOrder, updateOrder, deleteOrder } from "./api";
+import {
+  getOrders, createOrder, updateOrder, deleteOrder,
+  getCustomers, getWarehouses,
+} from "./api";
 
 export default function App() {
   const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [editing, setEditing] = useState(null);
   const [dark, setDark] = useState(
     () => localStorage.getItem("theme") === "dark"
@@ -16,6 +21,7 @@ export default function App() {
 
   useEffect(() => {
     refresh();
+    loadDropdowns();
   }, []);
 
   useEffect(() => {
@@ -32,6 +38,15 @@ export default function App() {
       setError("Could not reach the API. Is the Django server running on :8000?");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadDropdowns() {
+    try {
+      setCustomers(await getCustomers());
+      setWarehouses(await getWarehouses());
+    } catch (e) {
+      // dropdowns optional; ignore if they fail
     }
   }
 
@@ -99,7 +114,13 @@ export default function App() {
               </div>
             )}
 
-            <OrderForm editing={editing} onSave={handleSave} onCancel={() => setEditing(null)} />
+            <OrderForm
+              editing={editing}
+              customers={customers}
+              warehouses={warehouses}
+              onSave={handleSave}
+              onCancel={() => setEditing(null)}
+            />
 
             <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
               <p className="text-base font-medium mb-2">Orders</p>
@@ -111,7 +132,7 @@ export default function App() {
             </div>
 
             <p className="text-center text-xs text-slate-400 dark:text-slate-600 mt-8">
-              Django REST + React + PostgreSQL · FulfillPlus mini project
+               © 2026 FulfillPlus · 3PL Order Management
             </p>
           </div>
         </main>

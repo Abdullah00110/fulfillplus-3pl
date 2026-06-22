@@ -1,17 +1,35 @@
 from rest_framework import serializers
-from .models import Order
+from .models import Order, Customer, Warehouse
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ["id", "name"]
+
+
+class WarehouseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Warehouse
+        fields = ["id", "name"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Turns an Order into JSON (and validates JSON back into an Order)."""
+    # show the names in responses (read-only, handy for the table)
+    customer_name = serializers.CharField(source="customer.name", read_only=True)
+    warehouse_name = serializers.CharField(source="warehouse.name", read_only=True)
 
     class Meta:
         model = Order
         fields = [
             "id",
+            "customer",
             "customer_name",
+            "warehouse",
+            "warehouse_name",
             "product",
             "quantity",
+            "reference_number",
             "status",
             "created_at",
             "updated_at",

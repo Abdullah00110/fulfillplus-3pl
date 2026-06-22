@@ -31,7 +31,7 @@ export default function OrderTable({ orders, onEdit, onDelete }) {
             <tr key={o.id}
                 className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
               <td className="py-3 px-2 text-slate-400 dark:text-slate-500">#{o.id}</td>
-              <td className="py-3 px-2 text-slate-800 dark:text-slate-100">{o.customer_name}</td>
+              <td className="py-3 px-2 text-slate-800 dark:text-slate-100">{o.customer_name || "—"}</td>
               <td className="py-3 px-2 text-slate-600 dark:text-slate-300">{o.product}</td>
               <td className="py-3 px-2 text-center text-slate-600 dark:text-slate-300">{o.quantity}</td>
               <td className="py-3 px-2">
